@@ -1,0 +1,33 @@
+h2 {
+    margin: 10px;
+}
+
+.list-item {
+    padding: 10px;
+}
+
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 300px;
+    left: 300px;
+}
+
+#list-selected {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 300px;
+    overflow-y: auto;
+}
+
+#list-all {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    overflow-y: auto;
+}
