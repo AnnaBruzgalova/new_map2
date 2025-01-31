@@ -38,7 +38,12 @@ map.on("load", () => {
                 source: "vacancies",
                 type: "circle",
                 paint: {
-                    "circle-color": "#7EC8E3",
+                    "circle-color": [
+                        "step", ["get", "point_count"],
+                        "#7EC8E3", // цвет для кластеров с 1 элементом
+                        3, "#FFA500", // цвет для кластеров с 3 элементами
+                        6, "#FF4500" // цвет для кластеров с 6 элементами
+                    ],
                     "circle-stroke-width": 1,
                     "circle-stroke-color": "#FFFFFF",
                     "circle-radius": [
