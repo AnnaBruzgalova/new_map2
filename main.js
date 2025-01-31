@@ -10,14 +10,13 @@ map.on("load", () => {
         .then((response) => response.text())
         .then((csv) => {
             const rows = Papa.parse(csv, { header: true })
-                // console.log(rows)
             const geojsonFeatures = rows.data.map((row) => {
                 return {
                     type: "Feature",
                     properties: row,
                     geometry: {
                         type: "Point",
-                        coordinates: [row.lon, row.lat],
+                        coordinates: [row.lon, row.lat]
                     }
                 }
             })
@@ -30,8 +29,8 @@ map.on("load", () => {
                 type: "geojson",
                 data: geojson,
                 cluster: true,
-                clusterRadius: 20,
-            });
+                clusterRadius: 20
+            })
 
             map.addLayer({
                 id: "clusters",
@@ -57,7 +56,7 @@ map.on("load", () => {
                 },
             });
 
-            map.addLayer({
+            const a = map.addLayer({
                 id: "clusters-labels",
                 type: "symbol",
                 source: "vacancies",
@@ -65,18 +64,16 @@ map.on("load", () => {
                     "text-field": ["get", "point_count"],
                     "text-size": 10,
                 },
-            });
+            })
 
             geojson.features.map((f) => {
-                document.getElementById(
-                    "list-all"
-                ).innerHTML += `<div class="list-item">
-          <h4>${f.properties["Вакансия"]}</h4>
-          <a href='#' onclick="map.flyTo({center: [${f.geometry.coordinates}], zoom: 10})">Найти на карте</a>
-          </div><hr>`;
-            });
+                document.getElementById("list-all").innerHTML += `<div class="list-item">
+                <h4>${f.properties["Вакансия"]}</h4>
+                <a href="#" onclick="map.flyTo({ center: [${f.geometry.coordinates}], zoom: 10})">Найти на карте</a>
+                </div><hr>`
+            })
 
-            map.on('moveend', () => {
+            const fillSelectedList = () => {
                 const features = map.queryRenderedFeatures({
                     layers: ["clusters"]
                 });
@@ -92,30 +89,39 @@ map.on("load", () => {
                             .then((clusterFeatures) => {
                                 clusterFeatures.map((feature) => document.getElementById("list-selected")
                                     .innerHTML += `<div class="list-item">
-                    <h4>${feature.properties["Вакансия"]}</h4>
-                    <a target="blank_" href='${feature.properties["Ссылка на сайте Картетики"]}'>Подробнее</a>
-                    </div><hr>`)
+                          <h4>${feature.properties["Вакансия"]}</h4>
+                          <a target="blank_" href='${feature.properties["Ссылка на сайте Картетики"]}'>Подробнее</a>
+                          </div><hr>`)
                             });
                     } else {
                         document.getElementById("list-selected")
                             .innerHTML += `<div class="list-item">
-                <h4>${f.properties["Вакансия"]}</h4>
-                <a target="blank_" href='${f.properties["Ссылка на сайте Картетики"]}'>Подробнее</a>
-                </div><hr>`
+                      <h4>${f.properties["Вакансия"]}</h4>
+                      <a target="blank_" href='${f.properties["Ссылка на сайте Картетики"]}'>Подробнее</a>
+                      </div><hr>`
                     }
                 })
+            }
+
+            map.on("idle", () => {
+                fillSelectedList()
             })
+
+            map.on('moveend', () => {
+                fillSelectedList()
+            })
+
+
+            map.on("click", "clusters", function(e) {
+                map.flyTo({ center: e.lngLat, zoom: 8 });
+            })
+
+            map.on("mouseenter", "clusters", function() {
+                map.getCanvas().style.cursor = "pointer";
+            });
+
+            map.on("mouseleave", "clusters", function() {
+                map.getCanvas().style.cursor = "";
+            });
         })
-
-    map.on("click", "clusters", function(e) {
-        map.flyTo({ center: e.lngLat, zoom: 8 });
-    })
-
-    map.on("mouseenter", "clusters", function() {
-        map.getCanvas().style.cursor = "pointer";
-    });
-
-    map.on("mouseleave", "clusters", function() {
-        map.getCanvas().style.cursor = "";
-    });
-});
+})
